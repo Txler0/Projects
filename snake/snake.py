@@ -45,7 +45,7 @@ game_paused = False
 on_main_menu = True
 score = 0
 
-def show_main_menu():
+def show_main_menu(event):
     global on_main_menu, game_over, game_paused, play_button, settings_button
     on_main_menu = True
     game_over = False
@@ -76,6 +76,7 @@ def start_game(event):
     draw_snake()
 
 def show_settings(event):
+    global back_button
     # Remove the menu options
     canvas.delete("all")
     
@@ -83,10 +84,10 @@ def show_settings(event):
     canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 - 50, font=("Arial", 24), text="Settings", fill="white")
     canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font=("Arial", 16), text="Coming soon...", fill="white")
     canvas.create_rectangle(WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 70, WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/2 + 120, fill="gray")
-    canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 95, font=("Arial", 16), text="Back", fill="white")
+    back_button = canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 95, font=("Arial", 16), text="Back", fill="white")
     
     # Bind the click event to go back to the main menu
-    canvas.tag_bind("back", "<Button-1>", show_main_menu)
+    canvas.tag_bind(back_button, "<Button-1>", show_main_menu)
 
 def pause_game(e):
     global game_paused
@@ -107,7 +108,7 @@ def restart_game(event):
         game_over = False
         game_paused = False
         on_main_menu = True
-        show_main_menu()
+        show_main_menu(event=None)
 
 def change_direction(e):
     # print(e)
@@ -201,7 +202,7 @@ def draw_snake():
     window.after(100, draw_snake) # Add this line to continuously update the game state
 
     
-show_main_menu()
+show_main_menu(event= None)
 
 window.bind("<KeyRelease>", handle_key_release)
 
