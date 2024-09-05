@@ -18,6 +18,7 @@ window = tkinter.Tk()
 window.title("Snake")
 window.resizable(False, False)
 
+#game canvas   
 canvas = tkinter.Canvas(window, bg = "black", width=WINDOW_WIDTH, height=WINDOW_HEIGHT, borderwidth=0, highlightthickness=0)
 canvas.pack()
 window.update()
@@ -35,19 +36,78 @@ window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}+{window_x}+{window_y}")
 
 #initialize snakes and food
 snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) #this will create a singular tile for snake head
-food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
+food = Tile(10*TILE_SIZE, 10*TILE_SIZE) #snake food respectively
 snake_body = [] #multiple snake tiles
 velocityX = 0
 velocityY = 0
 game_over = False
 game_paused = False
+on_main_menu = True
 score = 0
+
+def show_main_menu():
+    global on_main_menu, game_over, game_paused, play_button, settings_button
+    on_main_menu = True
+    game_over = False
+    game_paused = False
+    print("show_main_menu")
+    # Clear the canvas
+    canvas.delete("all")
+    
+    # Draw the main menu options
+    canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 - 50, font=("Arial", 24), text="Snake Game", fill="white")
+    canvas.create_rectangle(WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2, WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/2 + 50, fill="gray")
+    play_button = canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 25, font=("Arial", 16), text="Play", fill="white")
+    canvas.create_rectangle(WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 70, WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/2 + 120, fill="gray")
+    settings_button = canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 95, font=("Arial", 16), text="Settings", fill="white")
+    
+    # Bind the click events to the menu options
+    canvas.tag_bind(play_button, "<Button-1>", start_game)
+    canvas.tag_bind(settings_button, "<Button-1>", show_settings)
+        
+def start_game(event):
+    global on_main_menu
+    print("start_game")
+    on_main_menu = False
+    # Remove the menu options
+    canvas.delete("all")
+    
+    # Start the game
+    draw_snake()
+
+def show_settings(event):
+    # Remove the menu options
+    canvas.delete("all")
+    
+    # Draw the settings menu
+    canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 - 50, font=("Arial", 24), text="Settings", fill="white")
+    canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font=("Arial", 16), text="Coming soon...", fill="white")
+    canvas.create_rectangle(WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 70, WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/2 + 120, fill="gray")
+    canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 95, font=("Arial", 16), text="Back", fill="white")
+    
+    # Bind the click event to go back to the main menu
+    canvas.tag_bind("back", "<Button-1>", show_main_menu)
 
 def pause_game(e):
     global game_paused
     
     if e.keysym == "space":
         game_paused = True if not game_paused else False
+
+def restart_game(event):
+        global snake, snake_body, food, score, game_over, game_paused, on_main_menu, velocityX, velocityY
+        print("restart_game")
+        canvas.delete("all")
+        snake = Tile(5*TILE_SIZE, 5*TILE_SIZE)
+        snake_body = []
+        food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
+        score = 0
+        velocityX = 0
+        velocityY = 0   
+        game_over = False
+        game_paused = False
+        on_main_menu = True
+        show_main_menu()
 
 def change_direction(e):
     # print(e)
@@ -70,7 +130,7 @@ def change_direction(e):
 
 def move_snake():
     global snake, game_over, food, snake_body, score
-    if (game_over):
+    if game_over:
         return
     
     if (snake.x < 0 or snake.x >= WINDOW_WIDTH or snake.y < 0 or snake.y >= WINDOW_HEIGHT):
@@ -82,7 +142,6 @@ def move_snake():
             game_over = True
             return
 
-    
     #collision check
     if (snake.x == food.x and snake.y == food.y):
         snake_body.append(Tile(food.x, food.y))
@@ -109,8 +168,8 @@ def handle_key_release(event):
     pause_game(event)
 
 def draw_snake():
-    global snake, snake_body, food, score, game_over
-
+    global snake, snake_body, food, score, game_over, on_main_menu, game_paused, restart_button
+    # print("draw_snake")
     if (not game_paused):
         move_snake()
 
@@ -125,20 +184,24 @@ def draw_snake():
     for tile in snake_body:
         canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill="lime green")
 
-    if (game_paused and not game_over):
+    if (game_paused and not game_over and not on_main_menu):
         canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font = ("Arial", 24), text = "Game Paused", fill = "white")
 
     if (game_over):
-        canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font = ("Arial", 24), text = f"Game Over \n  Score: {score}", fill = "white")
+    #    print("Game Over")
+       restart_button = canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font = ("Arial", 24), text = f"       Game Over \n          Score: {score}\n Click here to restart!", fill = "white")
+       canvas.tag_bind(restart_button, "<Button-1>", restart_game)
+       return
     else:
+        #TODO fix
         canvas.create_text(50, 20, font = ("Arial", 16), text = f"Score: {score}", fill = "white")
 
     canvas.create_text(WINDOW_WIDTH - 150, 20, font=("Arial", 11), text="Press space to pause the game", fill="white")
 
     window.after(100, draw_snake) # Add this line to continuously update the game state
 
-
-draw_snake()
+    
+show_main_menu()
 
 window.bind("<KeyRelease>", handle_key_release)
 
