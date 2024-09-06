@@ -1,5 +1,6 @@
 import tkinter
 import random
+import tkinter.ttk as ttk
 
 ROWS = 25
 COLS = 25
@@ -50,7 +51,8 @@ def show_main_menu(event):
     on_main_menu = True
     game_over = False
     game_paused = False
-    print("show_main_menu")
+
+    # print("show_main_menu")
     # Clear the canvas
     canvas.delete("all")
     
@@ -67,7 +69,7 @@ def show_main_menu(event):
         
 def start_game(event):
     global on_main_menu
-    print("start_game")
+    # print("start_game")
     on_main_menu = False
     # Remove the menu options
     canvas.delete("all")
@@ -79,13 +81,13 @@ def show_settings(event):
     global back_button
     # Remove the menu options
     canvas.delete("all")
-    
+
     # Draw the settings menu
     canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 - 50, font=("Arial", 24), text="Settings", fill="white")
     canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font=("Arial", 16), text="Coming soon...", fill="white")
     canvas.create_rectangle(WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2 + 70, WINDOW_WIDTH/2 + 100, WINDOW_HEIGHT/2 + 120, fill="gray")
     back_button = canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2 + 95, font=("Arial", 16), text="Back", fill="white")
-    
+
     # Bind the click event to go back to the main menu
     canvas.tag_bind(back_button, "<Button-1>", show_main_menu)
 
@@ -97,7 +99,7 @@ def pause_game(e):
 
 def restart_game(event):
         global snake, snake_body, food, score, game_over, game_paused, on_main_menu, velocityX, velocityY
-        print("restart_game")
+        # print("restart_game")
         canvas.delete("all")
         snake = Tile(5*TILE_SIZE, 5*TILE_SIZE)
         snake_body = []
